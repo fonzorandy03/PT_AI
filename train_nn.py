@@ -76,3 +76,26 @@ true_labels = np.argmax(y_test, axis=1)
 # Stampa qualche predizione rispetto alle etichette vere
 for i in range(10):
     print(f"Predicted: {label_encoder.inverse_transform([predicted_labels[i]])[0]}, True: {label_encoder.inverse_transform([true_labels[i]])[0]}")
+
+    # ==============================
+# SALVATAGGIO MODELLO + PREPROCESSING
+# ==============================
+from tensorflow.keras.models import save_model
+import pickle
+
+# 1) Salva il modello Keras (nuovo formato .keras)
+save_model(model, "pt_ai_nn_model.keras")
+print("✅ Modello Keras salvato in pt_ai_nn_model.keras")
+
+# 2) Salva scaler, label_encoder e info sulle colonne
+preprocessing_info = {
+    "scaler": scaler,
+    "label_encoder": label_encoder,
+    "numeric_columns": list(numeric_columns.columns),
+    "categorical_columns": list(categorical_data.columns)
+}
+
+with open("pt_ai_preprocessing_nn.pkl", "wb") as f:
+    pickle.dump(preprocessing_info, f)
+
+print("✅ Preprocessing salvato in pt_ai_preprocessing_nn.pkl")
