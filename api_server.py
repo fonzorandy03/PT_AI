@@ -17,21 +17,15 @@ CORS(app)
 
 try:
     print("📥 Caricamento modello PT_AI in corso...")
-    pt_model = load_model("pt_ai_nn_model.keras")
-
+    model = load_model("pt_ai_nn_model.keras")
     with open("pt_ai_preprocessing_nn.pkl", "rb") as f:
         prep = pickle.load(f)
-
-    scaler = prep["scaler"]
-    label_encoder = prep["label_encoder"]
-    numeric_columns = prep["numeric_columns"]
-    categorical_columns = prep["categorical_columns"]
-
     print("✅ Modello e preprocessing caricati correttamente!")
-
 except Exception as e:
-    print("❌ Errore durante il caricamento del modello:", e)
-    raise e
+    print(f"❌ Errore durante il caricamento del modello: {e}")
+    model = None
+    prep = None
+    # NIENTE raise e
 
 
 # ============================================================
