@@ -50,6 +50,8 @@ try:
     print("✅ Modello e preprocessing caricati correttamente!")
     print(f"📊 Colonne numeriche attese: {numeric_columns}")
     print(f"📊 Colonne categoriche attese: {categorical_columns}")
+    print(f"📊 Shape input modello: {model.input_shape}")
+    print(f"📊 StandardScaler n_features: {scaler.n_features_in_}")
 
 except Exception as e:
     print(f"❌ Errore durante il caricamento del modello o del preprocessing: {e}")
@@ -60,85 +62,99 @@ except Exception as e:
 # 🔍 FUNZIONE DI PREDIZIONE DELL'ESERCIZIO (PT_AI) - FIXED
 # ============================================================
 
-def predict_exercise(example_dict: dict) -> str:
+def predict_exercise(example_dict: dict):
     """
-    example_dict deve contenere gli angoli articolari.
+    Predice l'esercizio basandosi su angoli articolari e lato del corpo.
     
-    Esempio JSON dal client:
+    Input atteso:
     {
         "Shoulder_Angle": 160.0,
         "Elbow_Angle": 140.0,
         "Hip_Angle": 170.0,
         "Knee_Angle": 90.0,
         "Ankle_Angle": 110.0,
-        ...
+        "Shoulder_Ground_Angle": 80.0,
+        "Elbow_Ground_Angle": 45.0,
+        "Hip_Ground_Angle": 90.0,
+        "Knee_Ground_Angle": 90.0,
+        "Ankle_Ground_Angle": 90.0,
+        "Side": "Left"  # opzionale
     }
     """
 
     if model is None:
         raise RuntimeError("Modello non caricato.")
 
-    # 1. DataFrame con una sola riga
+    # 1. Crea DataFrame
     df_example = pd.DataFrame([example_dict])
     
     print(f"📥 Dati ricevuti: {list(example_dict.keys())}")
     print(f"📥 Colonne numeriche attese: {numeric_columns}")
 
-    # 2. Verifica che tutte le colonne numeriche siano presenti
+    # 2. Verifica colonne numeriche
     missing_cols = [col for col in numeric_columns if col not in df_example.columns]
     if missing_cols:
-        raise ValueError(f"Colonne mancanti: {missing_cols}")
+        raise ValueError(f"Colonne numeriche mancanti: {missing_cols}")
 
-    # 3. Estrazione delle colonne numeriche
-    df_num = df_example[numeric_columns]
+    # 3. Estrai colonne numeriche
+    df_num = df_example[numeric_columns].values
     print(f"✅ Colonne numeriche estratte: {df_num.shape}")
 
-    # 4. Gestione colonne categoriche (se presenti)
+    # 4. Scala SOLO le colonne numeriche
+    X_scaled = scaler.transform(df_num)
+    print(f"✅ Features numeriche scalate: {X_scaled.shape}")
+
+    # 5. Gestione colonne categoriche
     if categorical_columns and len(categorical_columns) > 0:
         print("🔄 Elaborazione colonne categoriche...")
         
-        # Trova colonne non numeriche
-        remaining_cols = [col for col in df_example.columns if col not in numeric_columns]
+        # Trova colonne categoriche nei dati ricevuti
+        cat_cols_present = [col for col in df_example.columns if col not in numeric_columns]
         
-        if len(remaining_cols) > 0:
+        if len(cat_cols_present) > 0:
             # Crea one-hot encoding
-            df_cat = pd.get_dummies(df_example[remaining_cols])
+            df_cat = pd.get_dummies(df_example[cat_cols_present])
             
-            # Allineamento colonne categoriche a quelle di training
-            for col in categorical_columns:
-                if col not in df_cat.columns:
-                    df_cat[col] = 0
+            # Crea un DataFrame vuoto con tutte le colonne categoriche del training
+            df_cat_aligned = pd.DataFrame(0, index=[0], columns=categorical_columns)
             
-            # Seleziona solo le colonne del training
-            df_cat = df_cat[categorical_columns]
+            # Riempi le colonne presenti
+            for col in df_cat.columns:
+                if col in df_cat_aligned.columns:
+                    df_cat_aligned[col] = df_cat[col].values
             
-            # Concatenazione numeriche + categoriche
-            X = np.hstack([df_num.values, df_cat.values])
-            print(f"✅ Features totali (numeriche + categoriche): {X.shape}")
+            print(f"✅ Colonne categoriche allineate: {df_cat_aligned.shape}")
+            
+            # Concatena numeriche scalate + categoriche
+            X_final = np.hstack([X_scaled, df_cat_aligned.values])
+            print(f"✅ Features finali (num + cat): {X_final.shape}")
         else:
-            # Solo colonne numeriche
-            X = df_num.values
-            print(f"✅ Solo features numeriche: {X.shape}")
+            # Nessuna colonna categorica nei dati → usa solo numeriche
+            X_final = X_scaled
+            print(f"✅ Solo features numeriche: {X_final.shape}")
     else:
-        # Nessuna colonna categorica
-        X = df_num.values
-        print(f"✅ Solo features numeriche: {X.shape}")
-
-    # 5. Scaling
-    X_scaled = scaler.transform(X)
-    print(f"✅ Features scalate: {X_scaled.shape}")
+        # Modello senza colonne categoriche
+        X_final = X_scaled
+        print(f"✅ Solo features numeriche: {X_final.shape}")
 
     # 6. Predizione
-    preds = model.predict(X_scaled, verbose=0)
-    idx = np.argmax(preds, axis=1)[0]
-    confidence = float(np.max(preds, axis=1)[0])
+    try:
+        preds = model.predict(X_final, verbose=0)
+        idx = np.argmax(preds, axis=1)[0]
+        confidence = float(np.max(preds, axis=1)[0])
 
-    # 7. Indice → etichetta esercizio
-    predicted_label = label_encoder.inverse_transform([idx])[0]
-    
-    print(f"✅ Predizione: {predicted_label} (confidenza: {confidence:.2%})")
-
-    return predicted_label, confidence
+        # 7. Decodifica label
+        predicted_label = label_encoder.inverse_transform([idx])[0]
+        
+        print(f"✅ Predizione: {predicted_label} (confidenza: {confidence:.2%})")
+        
+        return predicted_label, confidence
+        
+    except Exception as e:
+        print(f"❌ Errore durante predizione: {e}")
+        print(f"Shape features finali: {X_final.shape}")
+        print(f"Shape atteso dal modello: {model.input_shape}")
+        raise
 
 
 # ============================================================
@@ -150,11 +166,11 @@ def home():
     return jsonify({
         'status': 'online',
         'message': 'PT_AI API is running! 🏋️',
-        'version': '2.0.0',
+        'version': '2.0.1',
         'model_loaded': model is not None,
         'expected_features': {
             'numeric': numeric_columns.tolist() if numeric_columns is not None else [],
-            'categorical': categorical_columns.tolist() if categorical_columns is not None else []
+            'categorical': categorical_columns if categorical_columns is not None else []
         }
     })
 
@@ -174,7 +190,8 @@ def analyze_exercise():
         "Elbow_Ground_Angle": 45.0,
         "Hip_Ground_Angle": 90.0,
         "Knee_Ground_Angle": 90.0,
-        "Ankle_Ground_Angle": 90.0
+        "Ankle_Ground_Angle": 90.0,
+        "Side": "Left"
     }
 
     Risposta:
@@ -209,7 +226,8 @@ def analyze_exercise():
         return jsonify({
             'success': False, 
             'error': str(ve),
-            'expected_columns': numeric_columns.tolist() if numeric_columns is not None else []
+            'expected_numeric': numeric_columns.tolist() if numeric_columns is not None else [],
+            'expected_categorical': categorical_columns if categorical_columns is not None else []
         }), 400
 
     except Exception as e:
@@ -224,7 +242,10 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'model_loaded': model is not None,
-        'features_count': len(numeric_columns) + len(categorical_columns) if numeric_columns is not None else 0
+        'numeric_features': len(numeric_columns) if numeric_columns is not None else 0,
+        'categorical_features': len(categorical_columns) if categorical_columns is not None else 0,
+        'total_features': (len(numeric_columns) if numeric_columns is not None else 0) + 
+                         (len(categorical_columns) if categorical_columns is not None else 0)
     })
 
 
