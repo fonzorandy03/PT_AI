@@ -38,22 +38,10 @@ label_encoder = None
 try:
     print("📥 Caricamento modello PT_AI in corso...")
     
-    # Fix per compatibilità TensorFlow
     import tensorflow as tf
+    from tensorflow.keras.models import model_from_json
     
-    # Carica il modello con custom_objects per gestire InputLayer
-    model = load_model(
-        "pt_ai_nn_model.h5",
-        compile=False  # Non compilare per evitare problemi
-    )
-    
-    # Ricompila il modello
-    model.compile(
-        optimizer='adam',
-        loss='sparse_categorical_crossentropy',
-        metrics=['accuracy']
-    )
-
+    # Carica preprocessing
     with open("pt_ai_preprocessing_nn.pkl", "rb") as f:
         prep = pickle.load(f)
 
@@ -61,6 +49,24 @@ try:
     categorical_columns = prep["categorical_columns"]
     scaler = prep["scaler"]
     label_encoder = prep["label_encoder"]
+    
+    # Carica architettura dal JSON
+    print("📥 Caricamento architettura modello...")
+    with open("pt_ai_nn_architecture.json", "r") as json_file:
+        model_json = json_file.read()
+    
+    model = model_from_json(model_json)
+    
+    # Carica i pesi
+    print("📥 Caricamento pesi modello...")
+    model.load_weights("pt_ai_nn_model.weights.h5")
+    
+    # Compila il modello
+    model.compile(
+        optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
 
     print("✅ Modello e preprocessing caricati correttamente!")
     print(f"📊 Colonne numeriche attese: {numeric_columns}")
