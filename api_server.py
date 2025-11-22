@@ -43,7 +43,7 @@ try:
     
     # Carica il modello con custom_objects per gestire InputLayer
     model = load_model(
-        "pt_ai_nn_model.keras",
+        "pt_ai_nn_model.h5",
         compile=False  # Non compilare per evitare problemi
     )
     

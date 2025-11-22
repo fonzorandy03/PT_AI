@@ -83,9 +83,9 @@ for i in range(10):
 from tensorflow.keras.models import save_model
 import pickle
 
-# 1) Salva il modello Keras (nuovo formato .keras)
-save_model(model, "pt_ai_nn_model.keras")
-print("✅ Modello Keras salvato in pt_ai_nn_model.keras")
+# 1) Salva il modello in formato H5 (compatibile con Keras vecchi)
+model.save("pt_ai_nn_model.h5", save_format='h5')
+print("✅ Modello Keras salvato in pt_ai_nn_model.h5")
 
 # 2) Salva scaler, label_encoder e info sulle colonne
 preprocessing_info = {
