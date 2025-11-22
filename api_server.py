@@ -254,11 +254,18 @@ def health_check():
 # ============================================================
 
 if __name__ == '__main__':
+    import os
+    
     print("=" * 50)
     print("🚀 PT_AI API Server Starting...")
+    print(f"📁 Working directory: {os.getcwd()}")
+    print(f"📂 Files: {os.listdir('.')}")
     print("=" * 50)
+    
+    port = int(os.environ.get('PORT', 5000))
+    
     app.run(
         host='0.0.0.0',
-        port=5000,
-        debug=True
+        port=port,
+        debug=False  # ← IMPORTANTE per produzione
     )
