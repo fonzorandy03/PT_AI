@@ -37,7 +37,22 @@ label_encoder = None
 
 try:
     print("📥 Caricamento modello PT_AI in corso...")
-    model = load_model("pt_ai_nn_model.keras")
+    
+    # Fix per compatibilità TensorFlow
+    import tensorflow as tf
+    
+    # Carica il modello con custom_objects per gestire InputLayer
+    model = load_model(
+        "pt_ai_nn_model.keras",
+        compile=False  # Non compilare per evitare problemi
+    )
+    
+    # Ricompila il modello
+    model.compile(
+        optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
 
     with open("pt_ai_preprocessing_nn.pkl", "rb") as f:
         prep = pickle.load(f)
@@ -50,11 +65,10 @@ try:
     print("✅ Modello e preprocessing caricati correttamente!")
     print(f"📊 Colonne numeriche attese: {numeric_columns}")
     print(f"📊 Colonne categoriche attese: {categorical_columns}")
-    print(f"📊 Shape input modello: {model.input_shape}")
-    print(f"📊 StandardScaler n_features: {scaler.n_features_in_}")
 
 except Exception as e:
     print(f"❌ Errore durante il caricamento del modello o del preprocessing: {e}")
+    print(traceback.format_exc())
     model = None
 
 
