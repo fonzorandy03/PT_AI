@@ -80,22 +80,34 @@ for i in range(10):
     # ==============================
 # SALVATAGGIO MODELLO + PREPROCESSING
 # ==============================
-from tensorflow.keras.models import save_model
 import pickle
+import h5py
 
-# 1) Salva il modello in formato H5 (compatibile con Keras vecchi)
-model.save("pt_ai_nn_model.h5", save_format='h5')
-print("✅ Modello Keras salvato in pt_ai_nn_model.h5")
+print("💾 Salvataggio modello in formato compatibile...")
 
-# 2) Salva scaler, label_encoder e info sulle colonne
+# Metodo 1: Salva pesi separatamente (più compatibile)
+model.save_weights("pt_ai_nn_model.weights.h5")
+print("✅ Pesi salvati in pt_ai_nn_weights.h5")
+
+# Salva architettura in JSON
+model_json = model.to_json()
+with open("pt_ai_nn_architecture.json", "w") as json_file:
+    json_file.write(model_json)
+print("✅ Architettura salvata in pt_ai_nn_architecture.json")
+
+# Salva scaler, label_encoder e info sulle colonne + config modello
 preprocessing_info = {
     "scaler": scaler,
     "label_encoder": label_encoder,
     "numeric_columns": list(numeric_columns.columns),
-    "categorical_columns": list(categorical_data.columns)
+    "categorical_columns": list(categorical_data.columns),
+    "model_architecture": model_json,
+    "input_shape": processed_data.shape[1],
+    "output_shape": categorical_labels.shape[1]
 }
 
 with open("pt_ai_preprocessing_nn.pkl", "wb") as f:
     pickle.dump(preprocessing_info, f)
 
 print("✅ Preprocessing salvato in pt_ai_preprocessing_nn.pkl")
+print("🎉 Tutti i file salvati con successo!")
