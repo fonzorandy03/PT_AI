@@ -1,0 +1,184 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage[margin=2.5cm]{geometry}
+
+\title{PT AI Model - Report Tecnico\\Sistema di Riconoscimento Esercizi Fisici}
+\author{Alfonso}
+\date{29/11/2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduzione}
+Questo documento presenta i risultati del training del modello PT AI, un sistema di deep learning per il riconoscimento automatico di esercizi fisici basato su pose estimation.
+
+\section{Dataset}
+\subsection{Caratteristiche}
+\begin{itemize}
+    \item Campioni totali: 97,640
+    \item Features estratte: 10
+    \item Classi: 5
+    \item Esercizi: Jumping Jacks, Pull ups, Push Ups, Russian twists, Squats
+\end{itemize}
+
+\subsection{Preprocessing}
+Il dataset è stato preprocessato con le seguenti tecniche:
+\begin{enumerate}
+    \item \textbf{Feature Engineering Avanzato}: Calcolo di features geometriche (distanze, simmetrie, ratios) e temporali (velocità, accelerazione)
+    \item \textbf{Normalizzazione}: StandardScaler per portare tutte le features su scala comparabile
+    \item \textbf{Bilanciamento}: Oversampling delle classi minoritarie per evitare bias
+    \item \textbf{Data Augmentation}: Moltiplicazione dataset (2x) con rumore gaussiano e scaling
+    \item \textbf{Feature Selection}: VarianceThreshold per rimuovere features non informative
+\end{enumerate}
+
+\section{Architettura del Modello}
+\subsection{Topologia Rete Neurale}
+Il modello utilizza un'architettura Sequential con i seguenti layer:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lllr@{}}
+\toprule
+Layer & Type & Activation & Parameters \\
+\midrule
+Input & Dense & ReLU & 256 units \\
+ & BatchNormalization & - & - \\
+ & Dropout & - & 40\% \\
+Hidden 1 & Dense & ReLU & 128 units \\
+ & BatchNormalization & - & - \\
+ & Dropout & - & 30\% \\
+Hidden 2 & Dense & ReLU & 64 units \\
+ & BatchNormalization & - & - \\
+ & Dropout & - & 20\% \\
+Hidden 3 & Dense & ReLU & 32 units \\
+ & Dropout & - & 10\% \\
+Output & Dense & Softmax & 5 units \\
+\bottomrule
+\end{tabular}
+\caption{Architettura del modello}
+\end{table}
+
+\textbf{Parametri totali}: 48,005
+
+\subsection{Tecniche di Regolarizzazione}
+\begin{itemize}
+    \item L2 Regularization (weight decay = 0.001)
+    \item Batch Normalization dopo ogni Dense layer
+    \item Dropout progressivo (40\% → 30\% → 20\% → 10\%)
+\end{itemize}
+
+\section{Training}
+\subsection{Configurazione}
+\begin{itemize}
+    \item Optimizer: Adam (learning rate iniziale = 0.001)
+    \item Loss function: Categorical Crossentropy
+    \item Batch size: 32
+    \item Epochs: 150/150
+    \item Tempo di training: 5.46 minuti
+\end{itemize}
+
+\subsection{Callbacks}
+\begin{itemize}
+    \item Early Stopping (patience=20, monitor=val\_loss)
+    \item ReduceLROnPlateau (factor=0.5, patience=8)
+    \item ModelCheckpoint (save best weights)
+\end{itemize}
+
+\section{Risultati}
+\subsection{Metriche Globali}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metrica & Valore \\
+\midrule
+Test Accuracy & 95.07\% \\
+Test Loss & 0.1716 \\
+Precision (macro) & 0.9509 \\
+Recall (macro) & 0.9507 \\
+F1-Score (macro) & 0.9507 \\
+\bottomrule
+\end{tabular}
+\caption{Metriche complessive sul test set}
+\end{table}
+
+\subsection{Metriche per Classe}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Classe & Precision & Recall & F1-Score & Support \\
+\midrule
+Jumping Jacks & 0.9517 & 0.9481 & 0.9499 & 2930 \\
+Pull ups & 0.9178 & 0.9495 & 0.9334 & 2929 \\
+Push Ups & 0.9717 & 0.9723 & 0.9720 & 2929 \\
+Russian twists & 0.9811 & 0.9744 & 0.9777 & 2929 \\
+Squats & 0.9321 & 0.9092 & 0.9205 & 2929 \\
+\bottomrule
+\end{tabular}
+\caption{Metriche dettagliate per classe}
+\end{table}
+
+\subsection{Visualizzazioni}
+Le figure seguenti mostrano l'andamento del training e le performance del modello.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{01_training_history.png}
+\caption{Training history: Loss e Accuracy}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{02_confusion_matrix.png}
+\caption{Confusion Matrix normalizzata}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{03_per_class_metrics.png}
+\caption{Metriche per classe}
+\end{figure}
+
+\section{Analisi Errori}
+Il modello ha commesso 722 errori su 14646 predizioni (4.93\%).
+
+Le confusioni più frequenti sono:
+\begin{enumerate}
+    \item Squats $\rightarrow$ Pull ups: 131 volte
+    \item Jumping Jacks $\rightarrow$ Pull ups: 105 volte
+    \item Squats $\rightarrow$ Jumping Jacks: 76 volte
+    \item Pull ups $\rightarrow$ Squats: 55 volte
+    \item Push Ups $\rightarrow$ Squats: 51 volte
+\end{enumerate}
+
+\section{Conclusioni}
+Il modello PT AI raggiunge un'accuratezza di 95.07\% sul test set, dimostrando ottime capacità di generalizzazione.
+
+\subsection{Punti di Forza}
+\begin{itemize}
+    \item Alta accuratezza complessiva (> 90\%)
+    \item Buon bilanciamento tra precision e recall
+    \item Architettura robusta con regolarizzazione efficace
+    \item Feature engineering avanzato
+\end{itemize}
+
+\subsection{Possibili Miglioramenti}
+\begin{itemize}
+    \item Raccolta di più dati per classi minoritarie
+    \item Implementazione di temporal CNN/LSTM per sequenze video
+    \item Transfer learning da modelli pre-trained
+    \item Data augmentation più sofisticata (rotazioni, flip)
+\end{itemize}
+
+\end{document}

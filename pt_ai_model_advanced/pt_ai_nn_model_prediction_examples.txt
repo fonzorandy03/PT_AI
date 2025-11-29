@@ -1,0 +1,210 @@
+================================================================================
+ESEMPI DI PREDIZIONI - PT AI MODEL ADVANCED
+================================================================================
+
+✅ PREDIZIONI CORRETTE (primi 10 esempi):
+--------------------------------------------------------------------------------
+
+Esempio 1:
+   Predizione: Squats
+   Confidence: 91.59%
+   Probabilità per classe:
+      Jumping Jacks: 0.00%
+      Pull ups: 0.94%
+      Push Ups: 0.01%
+      Russian twists: 7.46%
+      Squats: 91.59%
+
+Esempio 2:
+   Predizione: Push Ups
+   Confidence: 98.68%
+   Probabilità per classe:
+      Jumping Jacks: 0.06%
+      Pull ups: 0.75%
+      Push Ups: 98.68%
+      Russian twists: 0.14%
+      Squats: 0.36%
+
+Esempio 3:
+   Predizione: Squats
+   Confidence: 85.26%
+   Probabilità per classe:
+      Jumping Jacks: 0.89%
+      Pull ups: 0.07%
+      Push Ups: 10.49%
+      Russian twists: 3.28%
+      Squats: 85.26%
+
+Esempio 4:
+   Predizione: Push Ups
+   Confidence: 99.98%
+   Probabilità per classe:
+      Jumping Jacks: 0.00%
+      Pull ups: 0.01%
+      Push Ups: 99.98%
+      Russian twists: 0.01%
+      Squats: 0.00%
+
+Esempio 5:
+   Predizione: Push Ups
+   Confidence: 99.50%
+   Probabilità per classe:
+      Jumping Jacks: 0.01%
+      Pull ups: 0.06%
+      Push Ups: 99.50%
+      Russian twists: 0.42%
+      Squats: 0.01%
+
+Esempio 6:
+   Predizione: Pull ups
+   Confidence: 94.30%
+   Probabilità per classe:
+      Jumping Jacks: 1.06%
+      Pull ups: 94.30%
+      Push Ups: 0.00%
+      Russian twists: 0.00%
+      Squats: 4.63%
+
+Esempio 7:
+   Predizione: Squats
+   Confidence: 99.65%
+   Probabilità per classe:
+      Jumping Jacks: 0.00%
+      Pull ups: 0.01%
+      Push Ups: 0.16%
+      Russian twists: 0.17%
+      Squats: 99.65%
+
+Esempio 8:
+   Predizione: Pull ups
+   Confidence: 95.06%
+   Probabilità per classe:
+      Jumping Jacks: 0.80%
+      Pull ups: 95.06%
+      Push Ups: 0.00%
+      Russian twists: 0.00%
+      Squats: 4.14%
+
+Esempio 9:
+   Predizione: Squats
+   Confidence: 99.62%
+   Probabilità per classe:
+      Jumping Jacks: 0.02%
+      Pull ups: 0.01%
+      Push Ups: 0.05%
+      Russian twists: 0.31%
+      Squats: 99.62%
+
+Esempio 10:
+   Predizione: Pull ups
+   Confidence: 98.55%
+   Probabilità per classe:
+      Jumping Jacks: 0.01%
+      Pull ups: 98.55%
+      Push Ups: 0.00%
+      Russian twists: 0.08%
+      Squats: 1.35%
+
+================================================================================
+❌ PREDIZIONI ERRATE (primi 10 esempi):
+--------------------------------------------------------------------------------
+
+Esempio 1:
+   Predizione: Squats (Confidence: 53.49%)
+   Vero Label: Pull ups
+   Probabilità per classe:
+        Jumping Jacks: 4.78%
+      ✓ Pull ups: 41.67%
+        Push Ups: 0.00%
+        Russian twists: 0.06%
+        Squats: 53.49%
+
+Esempio 2:
+   Predizione: Jumping Jacks (Confidence: 97.35%)
+   Vero Label: Squats
+   Probabilità per classe:
+        Jumping Jacks: 97.35%
+        Pull ups: 1.48%
+        Push Ups: 0.03%
+        Russian twists: 0.00%
+      ✓ Squats: 1.14%
+
+Esempio 3:
+   Predizione: Squats (Confidence: 82.88%)
+   Vero Label: Pull ups
+   Probabilità per classe:
+        Jumping Jacks: 0.81%
+      ✓ Pull ups: 16.29%
+        Push Ups: 0.00%
+        Russian twists: 0.03%
+        Squats: 82.88%
+
+Esempio 4:
+   Predizione: Squats (Confidence: 79.17%)
+   Vero Label: Russian twists
+   Probabilità per classe:
+        Jumping Jacks: 0.00%
+        Pull ups: 1.56%
+        Push Ups: 0.01%
+      ✓ Russian twists: 19.26%
+        Squats: 79.17%
+
+Esempio 5:
+   Predizione: Pull ups (Confidence: 72.21%)
+   Vero Label: Squats
+   Probabilità per classe:
+        Jumping Jacks: 3.04%
+        Pull ups: 72.21%
+        Push Ups: 0.00%
+        Russian twists: 0.00%
+      ✓ Squats: 24.74%
+
+Esempio 6:
+   Predizione: Pull ups (Confidence: 59.91%)
+   Vero Label: Squats
+   Probabilità per classe:
+        Jumping Jacks: 4.36%
+        Pull ups: 59.91%
+        Push Ups: 0.01%
+        Russian twists: 0.06%
+      ✓ Squats: 35.66%
+
+Esempio 7:
+   Predizione: Jumping Jacks (Confidence: 78.30%)
+   Vero Label: Pull ups
+   Probabilità per classe:
+        Jumping Jacks: 78.30%
+      ✓ Pull ups: 21.17%
+        Push Ups: 0.46%
+        Russian twists: 0.05%
+        Squats: 0.02%
+
+Esempio 8:
+   Predizione: Squats (Confidence: 78.77%)
+   Vero Label: Push Ups
+   Probabilità per classe:
+        Jumping Jacks: 0.01%
+        Pull ups: 0.11%
+      ✓ Push Ups: 20.89%
+        Russian twists: 0.22%
+        Squats: 78.77%
+
+Esempio 9:
+   Predizione: Squats (Confidence: 58.91%)
+   Vero Label: Push Ups
+   Probabilità per classe:
+        Jumping Jacks: 0.05%
+        Pull ups: 0.24%
+      ✓ Push Ups: 40.30%
+        Russian twists: 0.50%
+        Squats: 58.91%
+
+Esempio 10:
+   Predizione: Pull ups (Confidence: 65.90%)
+   Vero Label: Squats
+   Probabilità per classe:
+        Jumping Jacks: 0.02%
+        Pull ups: 65.90%
+        Push Ups: 0.00%
+        Russian twists: 0.10%
+      ✓ Squats: 33.98%
